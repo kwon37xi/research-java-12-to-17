@@ -13,9 +13,10 @@ plugins {
 
 ext {
     junitVersion = "5.6.2"
+    lombokVersion = "1.18.12"
 }
 
-group = 'kr.pe.kwonnam.research'
+group = 'kr.pe.kwonnam.research-java-9-10-11'
 version = '0.0.1-SNAPSHOT'
 
 sourceCompatibility = '11'
@@ -29,7 +30,15 @@ repositories {
 }
 
 dependencies {
-    // This dependency is used by the application.
+    implementation 'org.slf4j:jcl-over-slf4j:1.7.30'
+    implementation 'org.slf4j:log4j-over-slf4j:1.7.30'
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
     implementation 'com.google.guava:guava:28.2-jre'
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
@@ -42,6 +51,10 @@ configurations {
     all*.exclude group: 'log4j', module: 'log4j' // replaced with log4j-over-slf4j
     all*.exclude group: 'org.apache.logging.log4j' // replaced with log4j-over-slf4j
     all*.exclude module: 'slf4j-log4j12'
+
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 test {
