@@ -7,16 +7,24 @@
  */
 
 plugins {
-    // Apply the java plugin to add support for Java
-    id 'java'
-
-    // Apply the application plugin to add support for building a CLI application.
+    id 'java-library'
     id 'application'
 }
 
+ext {
+    junitVersion = "5.6.2"
+}
+
+group = 'kr.pe.kwonnam.research'
+version = '0.0.1-SNAPSHOT'
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
 repositories {
-    // Use jcenter for resolving dependencies.
-    // You can declare any Maven/Ivy/file repository here.
+    mavenCentral()
     jcenter()
 }
 
@@ -24,9 +32,22 @@ dependencies {
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:28.2-jre'
 
-    // Use JUnit test framework
-    testImplementation 'junit:junit:4.12'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+    testImplementation "org.assertj:assertj-core:3.16.1"
 }
+
+configurations {
+    all*.exclude group: 'commons-logging', module: 'commons-logging' // replaced with jcl-over-slf4j
+    all*.exclude group: 'log4j', module: 'log4j' // replaced with log4j-over-slf4j
+    all*.exclude group: 'org.apache.logging.log4j' // replaced with log4j-over-slf4j
+    all*.exclude module: 'slf4j-log4j12'
+}
+
+test {
+    useJUnitPlatform()
+}
+
 
 application {
     // Define the main class for the application.
