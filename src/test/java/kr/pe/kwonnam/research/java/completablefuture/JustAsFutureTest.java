@@ -8,11 +8,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 @Slf4j
 public class JustAsFutureTest {
@@ -53,5 +55,18 @@ public class JustAsFutureTest {
         String result = future.get();
 
         assertThat(result).isEqualTo("World!");
+    }
+
+    @Test
+    void calculateAsyncWithCancellation() {
+        CancellationException cancellationException = catchThrowableOfType(() -> {
+                Future<String> future = justAsFuture.calculateAsyncWithCancellation();
+                future.get();
+            },
+            CancellationException.class);
+
+        assertThat(cancellationException)
+            .hasMessage(null)
+            .hasNoCause();
     }
 }

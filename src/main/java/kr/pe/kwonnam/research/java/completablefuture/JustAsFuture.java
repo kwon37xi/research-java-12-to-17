@@ -16,4 +16,16 @@ public class JustAsFuture {
 
         return completableFuture;
     }
+
+    public Future<String> calculateAsyncWithCancellation() {
+        CompletableFuture<String> completableFuture = new CompletableFuture<>();
+
+        Executors.newCachedThreadPool().submit(() -> {
+            Thread.sleep(500);
+            completableFuture.cancel(false);
+            return null;
+        });
+
+        return completableFuture;
+    }
 }
