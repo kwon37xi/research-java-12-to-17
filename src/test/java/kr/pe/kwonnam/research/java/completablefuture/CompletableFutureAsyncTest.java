@@ -17,8 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
 @DisplayName("CompletableFutureAsyncTest")
@@ -166,5 +165,41 @@ class CompletableFutureAsyncTest {
 
         // 비동기로 실행되더라도 join 하는 순서 때문에 future1, future2, future3 순서가 그대로 유지됨.
         assertThat(combined).isEqualTo("Hello Beautiful World");
+    }
+
+    @Test
+    @DisplayName("supplyAsyncWithException : handle을 통해 예외를 처리한다. handle이 받는 예외는 CompletionException 으로 감싸져 있다. handle() 자체도 CompletableFuture 를 리턴한다.")
+    void supplyAsyncWithException_no_name() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> completableFuture = completableFutureAsync.supplyAsyncWithException(null);
+        assertThat(completableFuture.get())
+            .as("예외가 발생했으므로 예외 관련 내용을 반환한다. throwable은 CompletionException 으로 감싸져 있다.")
+            .isEqualTo("Hello Stranger! - throwable name : java.util.concurrent.CompletionException, java.lang.IllegalArgumentException: Computation Error!");
+    }
+
+    @Test
+    @DisplayName("supplyAsyncWithException : handle을 통해 정상응답을 처리한다. handle() 자체도 CompletableFuture 를 리턴한다.")
+    void supplyAsyncWithException_with_name() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> completableFuture = completableFutureAsync.supplyAsyncWithException("Seoul");
+        assertThat(completableFuture.get())
+            .as("정상 응답을 리턴한다.")
+            .isEqualTo("Hello Seoul");
+    }
+
+    @Test
+    @DisplayName("completeExceptionally : 예외를 던지고 끝내버린다.")
+    void completeExceptionally() {
+        IllegalArgumentException causeException = new IllegalArgumentException("Calculation failed!");
+
+        CompletableFuture<String> completableFuture = new CompletableFuture<>();
+        completableFuture.completeExceptionally(causeException);
+
+        ExecutionException executionException = catchThrowableOfType(() -> {
+            completableFuture.get();
+        }, ExecutionException.class);
+
+        assertThat(executionException)
+            .as("ExecutionException 이 실제 예외를 감싸고 있다.")
+            .hasCause(causeException)
+            .hasMessage("java.lang.IllegalArgumentException: Calculation failed!");
     }
 }
