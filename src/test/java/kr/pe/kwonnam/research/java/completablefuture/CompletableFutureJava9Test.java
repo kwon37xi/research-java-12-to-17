@@ -17,9 +17,7 @@ public class CompletableFutureJava9Test {
     @BeforeEach
     void setUp() {
         atomicInteger = new AtomicInteger();
-        myExecutor = Executors.newCachedThreadPool(r -> {
-            return new Thread(r, "MyExecutor-" + atomicInteger.getAndIncrement());
-        });
+        myExecutor = Executors.newCachedThreadPool(r -> new Thread(r, "MyExecutor-" + atomicInteger.getAndIncrement()));
     }
 
     @AfterEach
@@ -50,8 +48,8 @@ public class CompletableFutureJava9Test {
     }
 
     @Test
-    @DisplayName("defaultExecutor 만 override 하면 defaultExecutor()는 적용되지 않는다.")
-    void defaultExecutorOverrideThenSomeAsync() throws ExecutionException, InterruptedException {
+    @DisplayName("NeoCompletableFuture : defaultExecutor override 로 다른 *Async 들이 defaultExecutor 에서 실행된다.")
+    void defaultExecutorOverrideThenSomeAsync() {
 
         List<String> threadNames = Collections.synchronizedList(new ArrayList<>());
 
@@ -60,11 +58,6 @@ public class CompletableFutureJava9Test {
             return "Hello";
         }, myExecutor);
 
-        try {
-            TimeUnit.MILLISECONDS.sleep(100L);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         CompletableFuture<Void> voidCompletableFuture = completableFuture.thenApplyAsync(s -> {
             threadNames.add(Thread.currentThread().getName());
             return s + " World!";
@@ -83,7 +76,16 @@ public class CompletableFutureJava9Test {
             .startsWith("MyExecutor-0");
         assertThat(threadNames.get(2))
             .as("newIncompleteFuture() 메소드도 함께 override 하면 나머지 thenAcceptAsync 에 defaultExecutor()가 적용된다.")
-            .startsWith("MyExecutor");
+            .startsWith("MyExecutor-");
+    }
 
+    @Test
+    @DisplayName("NeoCompletableFuture : runAsync 를 override 하여, 원하는 executor 로 실행한다.")
+    void defaultExecutorRunAsync() {
+        List<String> threadNames = Collections.synchronizedList(new ArrayList<>());
+        NeoCompletableFuture.runAsync​(() -> threadNames.add(Thread.currentThread().getName()), myExecutor);
+
+        assertThat(threadNames).hasSize(1)
+            .hasSameElementsAs(List.of("MyExecutor-0"));
     }
 }
