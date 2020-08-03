@@ -6,6 +6,8 @@
 ## Baeldung Guide To CompletableFuture
 * [Guide To CompletableFuture](https://www.baeldung.com/java-completablefuture)
 * [Java 9 CompletableFuture API Improvements](https://www.baeldung.com/java-9-completablefuture)
+* [Completable Future Improvements in Java9](https://blog.knoldus.com/completablefuture-improvements-in-java9/)
+
 * JustAsFuture.java, JustAsFutureTest.java, CompletableFutureAsyncTest.java
 
 ### thenApply
