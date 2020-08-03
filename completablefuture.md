@@ -45,3 +45,11 @@ Unchecked Exception 이라서 `Stream.map` 에서 사용가능하다.
 * 작업의 `complete()` 시점 이전 혹은 이후에 `thenXXX` 호출 여부에 따라 `thenXXX` 의 실행 쓰레드가 달라질 수 있다.
 * 따라서 쓰레드를 확신하지 말고, 어디서 실행되어도 상관없게 작성해야 한다.
 
+## CompletableFuture 의 상속
+* `CompletableFuture` 는 사실상 상속하기 매우 어렵다.
+* 상속시에 무조건 `CompletableFuture<U> newIncompleteFuture()`도 override 해야한다.
+* 최초 시작지점이 보통 static 메소드인 `CompletableFuture.supplyAsync` 등일 가능성이 높은데,
+이런 static 메소드들 까지 모두 새로 만들지 않으면 사실상 상속의 의미가 없다.
+* 따라서 `CompletableFuture.defaultExecutor()`도 거의 읽기만 가능할 뿐, 이것만 override하는 것은 큰 의미가 없다.
+* [Java 8 이하의 CompletableFuture의 상속](https://stackoverflow.com/a/26607433/1051402)
+* [NeoCompletableFuture - supplyAsync까지 모두 Override 예제](src/main/java/kr/pe/kwonnam/research/java/completablefuture/NeoCompletableFuture.java)
