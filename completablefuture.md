@@ -74,6 +74,8 @@ Unchecked Exception 이라서 `Stream.map` 에서 사용가능하다.
 * `whenComplete` 는 그 자체로 종결되는 것이 목표다.
 * `handle` 은 다시 새로운 `CompletableFuture` 작업이 시작된다.
 
-
 ## orTimeout
 * 시간내에 complete 되지 않을 경우 `TimeoutException`이 발생하고, 시간내에 완료되면 그대로 결과를 반환한다.
+
+## completeOnTimeout
+* 시간내에 complete 되지 않을 경우 `completeOnTimeout`에 지정된 값이 결과로 반환되고, 성공한 `CompletableFuture`로 간주된다.

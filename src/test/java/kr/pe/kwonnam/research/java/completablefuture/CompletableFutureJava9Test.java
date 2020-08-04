@@ -216,4 +216,47 @@ public class CompletableFutureJava9Test {
             .hasCauseInstanceOf(TimeoutException.class)
             .hasMessage(TimeoutException.class.getName());
     }
+
+
+    @Test
+    @DisplayName("completeOnTimeout : 시간내 수행 완료시 성공시 값을 반환한다.")
+    void completeOnTimeoutInTime() {
+        CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "Hello CompletableFuture!";
+        }).completeOnTimeout("You failed!", 2, TimeUnit.SECONDS);
+
+        completableFuture.join();
+
+        assertThat(completableFuture)
+            .as("시간내 수행 완료를 성공하면 오류 없이 성공한 값을 리턴한다.")
+            .isCompleted()
+            .isNotCancelled()
+            .isCompletedWithValue("Hello CompletableFuture!");
+    }
+
+    @Test
+    @DisplayName("completeOnTimeout : 시간내 수행 완료 실패시 completeOnTimeout에 지정된 값을 반환한다.")
+    void completeOnTimeoutNotInTime() {
+        CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "Hello CompletableFuture!";
+        }).completeOnTimeout("You failed!", 1, TimeUnit.SECONDS);
+
+        completableFuture.join();
+
+        assertThat(completableFuture)
+            .as("시간내 수행 완료를 못했을 경우에도 오류 없이 completeOnTimeout 에 지정한 값을 리턴한다.")
+            .isCompleted()
+            .isNotCancelled()
+            .isCompletedWithValue("You failed!");
+    }
 }
