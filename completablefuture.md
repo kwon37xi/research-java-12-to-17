@@ -1,5 +1,9 @@
 # CompletableFuture research
 * package `kr.pe.kwonnam.research.java.completablefuture`
+* [JustAsFutureTest](src/test/java/kr/pe/kwonnam/research/java/completablefuture/JustAsFutureTest)
+* [CompletableFutureAsyncTest.java](src/test/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureAsyncTest.java)
+* [CompletableFutureJava9Test.java](src/test/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureJava9Test.java)
+
 * https://kwonnam.pe.kr/wiki/java/8/completable_future
 * [Java 11 CompletableFuture](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/CompletableFuture.html)
 
@@ -57,3 +61,15 @@ Unchecked Exception 이라서 `Stream.map` 에서 사용가능하다.
 * [Java 9 이후의 CompletableFuture의 상속 - completeAsync 사용](https://stackoverflow.com/a/56356109/1051402)
 * [Java 8 이하의 CompletableFuture의 상속](https://stackoverflow.com/a/26607433/1051402)
 * [NeoCompletableFuture - supplyAsync까지 모두 Override 예제](src/main/java/kr/pe/kwonnam/research/java/completablefuture/NeoCompletableFuture.java)
+
+## copy()
+* `copy()' 는 원본 `CompletableFuture`의 상태를 기본적으로 그대로 복제한다.
+* 하지만 아직 원본의 작업이 끝나지 않은 상태를 복제한 뒤에 변경을 복제본에 가하면(`cancel() 등`) 그 여파는 복제본에만 반영된다.
+* `CompletableFuture`를 반환하되, 해당 객체의 상태를 클라이언트가 변경할 수 없게 하고자 할 때 사용하면 될 듯.
+
+## thenCompose, whenComplete, handle 의 차이점
+* 셋 다 새로운 `CompletableFuture`를 리턴한다.
+* `thenComplete' 는 앞선 실행이 오류가 없을 경우에만 후속으로 실행된다. `Stream.flatMap`과 유사하다.
+* `whenComplete`, `handle` 은 앞선 실행이 성공으로 끝나든 예외가 발생하든 실행되면 성공값과 예외를 모두 인자로 받는다.
+* `whenComplete` 는 그 자체로 종결되는 것이 목표다.
+* `handle` 은 다시 새로운 `CompletableFuture` 작업이 시작된다.

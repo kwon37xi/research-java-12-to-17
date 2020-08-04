@@ -110,7 +110,7 @@ class CompletableFutureAsyncTest {
     }
 
     @Test
-    @DisplayName("thenCompose : supplyAsync 이후 그 결과 값을 받아 또 다른 CompletableFuture를 비동기로 수행하려면 thenCompose 를 사용한다.")
+    @DisplayName("thenCompose : supplyAsync 이후 그 결과 값을 받아 또 다른 CompletableFuture를 수행하려면 thenCompose 를 사용한다.")
     void thenCompose() throws ExecutionException, InterruptedException {
         CompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> "Hello")
             .thenCompose(s -> CompletableFuture.supplyAsync(() -> s + " World!"));
