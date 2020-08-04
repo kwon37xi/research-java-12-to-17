@@ -2,6 +2,7 @@ package kr.pe.kwonnam.research.java.completablefuture;
 
 import org.junit.jupiter.api.*;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -258,5 +259,21 @@ public class CompletableFutureJava9Test {
             .isCompleted()
             .isNotCancelled()
             .isCompletedWithValue("You failed!");
+    }
+
+    @Test
+    void delayedExecutor() throws ExecutionException, InterruptedException {
+        Executor delayedExecutor = CompletableFuture.delayedExecutor(1, TimeUnit.SECONDS);
+
+        List<Long> timestamps = Collections.synchronizedList(new ArrayList<>());
+        timestamps.add(System.currentTimeMillis());
+        String result = CompletableFuture.supplyAsync(() -> {
+            timestamps.add(System.currentTimeMillis());
+            return "delayed!";
+        }, delayedExecutor).get();
+
+        assertThat(result).isEqualTo("delayed!");
+        Duration delayed = Duration.ofMillis(timestamps.get(1) - timestamps.get(0));
+        assertThat(delayed).isBetween(Duration.ofMillis(1000), Duration.ofMillis(1100));
     }
 }

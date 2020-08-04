@@ -79,3 +79,6 @@ Unchecked Exception 이라서 `Stream.map` 에서 사용가능하다.
 
 ## completeOnTimeout
 * 시간내에 complete 되지 않을 경우 `completeOnTimeout`에 지정된 값이 결과로 반환되고, 성공한 `CompletableFuture`로 간주된다.
+
+## delayedExecutor
+* static 메소드로, 기반 executor를 무조건 지정된 시간만큼 지연을 시켜서 submit 이 되게끔 해주는 감싸진 executor 를 반환한다.
