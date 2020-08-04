@@ -73,3 +73,7 @@ Unchecked Exception 이라서 `Stream.map` 에서 사용가능하다.
 * `whenComplete`, `handle` 은 앞선 실행이 성공으로 끝나든 예외가 발생하든 실행되면 성공값과 예외를 모두 인자로 받는다.
 * `whenComplete` 는 그 자체로 종결되는 것이 목표다.
 * `handle` 은 다시 새로운 `CompletableFuture` 작업이 시작된다.
+
+
+## orTimeout
+* 시간내에 complete 되지 않을 경우 `TimeoutException`이 발생하고, 시간내에 완료되면 그대로 결과를 반환한다.

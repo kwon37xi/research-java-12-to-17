@@ -171,4 +171,49 @@ public class CompletableFutureJava9Test {
             .as("toCompletableFuture()로 다시 원상 복구하면 CompletableFuture의 메소드가 호출 가능해진다.")
             .isFalse();
     }
+
+    @Test
+    @DisplayName("completeAsync : supplier 를 비동기로 수행하고 CompletableFuture를 완료한다.")
+    void completeAsync() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> completableFuture = new CompletableFuture<>()
+            .completeAsync(() -> "Hello CompletableFuture!")
+            .thenApply(s -> s + " How are you doing?");
+
+        assertThat(completableFuture.get()).isEqualTo("Hello CompletableFuture! How are you doing?");
+    }
+
+    @Test
+    @DisplayName("orTimeout : 시간내 수행 완료시 오류 없이 완료된다.")
+    void orTimeoutInTime() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> "Hello CompletableFuture!")
+            .orTimeout(1, TimeUnit.SECONDS);
+
+        assertThat(completableFuture.get())
+            .as("시간내 실행 완료시 오류 없이 완료한다.")
+            .isEqualTo("Hello CompletableFuture!");
+    }
+
+
+    @Test
+    @DisplayName("orTimeout : 시간내 수행 완료 실패시 오류가 발생한다.")
+    void orTimeoutNotInTime() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "Hello CompletableFuture!";
+        })
+            .orTimeout(1, TimeUnit.SECONDS);
+
+        ExecutionException executionException = catchThrowableOfType(() -> {
+            completableFuture.get();
+        }, ExecutionException.class);
+
+        assertThat(executionException)
+            .as("시간내 실행 완료 실패시 오류가 발생한다.")
+            .hasCauseInstanceOf(TimeoutException.class)
+            .hasMessage(TimeoutException.class.getName());
+    }
 }
