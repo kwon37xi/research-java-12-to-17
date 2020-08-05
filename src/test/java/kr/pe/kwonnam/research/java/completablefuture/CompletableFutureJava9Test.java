@@ -292,6 +292,7 @@ public class CompletableFutureJava9Test {
     }
 
     @Test
+    @DisplayName("failedStage와 failedFuture 는 이미 실패된 상태의 객체를 반환한다.")
     void failedStageAndFailedFuture() {
         assertThat(CompletableFuture.failedStage(new IllegalStateException("알 수 없는 상태입니다.")))
             .isInstanceOf(CompletableFuture.class)
@@ -304,5 +305,22 @@ public class CompletableFutureJava9Test {
             .hasFailedWithThrowableThat()
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("인자가 올바르지 않습니다.");
+    }
+
+    @Test
+    @DisplayName("completeOnTimeout으로 delay 된 실행을 구현할 수도 있다.")
+    void delayWithCompleteOnTimeout() throws ExecutionException, InterruptedException {
+        long startTimestamp = System.currentTimeMillis();
+
+        String result = new CompletableFuture<String>()
+            .completeOnTimeout("Hello World!", 3, TimeUnit.SECONDS)
+            .get();
+
+        long endTimestamp = System.currentTimeMillis();
+
+        Duration duration = Duration.ofMillis(endTimestamp - startTimestamp);
+
+        assertThat(duration).isBetween(Duration.ofMillis(3000), Duration.ofMillis(3100));
+        assertThat(result).isEqualTo("Hello World!");
     }
 }
