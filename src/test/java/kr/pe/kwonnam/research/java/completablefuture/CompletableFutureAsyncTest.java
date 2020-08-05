@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -201,5 +202,29 @@ class CompletableFutureAsyncTest {
             .as("ExecutionException 이 실제 예외를 감싸고 있다.")
             .hasCause(causeException)
             .hasMessage("java.lang.IllegalArgumentException: Calculation failed!");
+    }
+
+    @Test
+    @DisplayName("CompletableFuture 는 get()을 할 경우 어디선가(별도 쓰레드)에서 complete()이 호출될 때 까지 block 된다.")
+    void complete() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> completableFuture = new CompletableFuture<>();
+
+        new Thread(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            completableFuture.complete("Hello CompletableFuture!");
+        }).start();
+
+        long startTimestamp = System.currentTimeMillis();
+        String result = completableFuture.get();
+        long endTimestamp = System.currentTimeMillis();
+
+        Duration duration = Duration.ofMillis(endTimestamp - startTimestamp);
+
+        assertThat(duration).isBetween(Duration.ofMillis(1000), Duration.ofMillis(1100));
+        assertThat(result).isEqualTo("Hello CompletableFuture!");
     }
 }
