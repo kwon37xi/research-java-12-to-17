@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -138,6 +139,39 @@ class CompletableFutureAsyncTest {
     }
 
     @Test
+    @DisplayName("acceptEither : 둘 중에 먼저 실행된 값만 취한다.")
+    void acceptEither() {
+        List<String> results = new ArrayList<>();
+        CompletableFuture<String> slowCompletableFuture = new CompletableFuture<String>()
+            .completeOnTimeout("slow result", 1000, TimeUnit.MILLISECONDS);
+
+        slowCompletableFuture.acceptEither(new CompletableFuture<String>()
+            .completeOnTimeout("fast result", 100, TimeUnit.MILLISECONDS), s -> {
+            results.add(s);
+        }).join();
+
+        assertThat(results)
+            .as("빠르게 실행이 끝난 결과 값만을 가지고 있다.")
+            .hasSize(1)
+            .contains("fast result");
+    }
+
+    @Test
+    @DisplayName("applyToEither : 둘 중에 먼저 실행된 값을 취해서 반환하거나 값을 변경한다.")
+    void applyToEither() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> slowCompletableFuture = new CompletableFuture<String>()
+            .completeOnTimeout("slow result", 1000, TimeUnit.MILLISECONDS);
+
+        CompletableFuture<String> winnerCompletableFuture = slowCompletableFuture.applyToEither(new CompletableFuture<String>()
+            .completeOnTimeout("fast result", 100, TimeUnit.MILLISECONDS), Function.identity())
+            .thenApply(s -> "Winner : " + s);
+
+        assertThat(winnerCompletableFuture.get())
+            .as("빠르게 실행이 끝난 결과 값의 앞에 'Winner : '를 붙여준다.")
+            .isEqualTo("Winner : fast result");
+    }
+
+    @Test
     @DisplayName("allOf : 모든 CompletableFuture 를 동시 실행하고 종료될 때 까지 기다린다.")
     void allOf() throws ExecutionException, InterruptedException {
         CompletableFuture<String> future1 = CompletableFuture.supplyAsync(() -> "Hello");
@@ -226,5 +260,32 @@ class CompletableFutureAsyncTest {
 
         assertThat(duration).isBetween(Duration.ofMillis(1000), Duration.ofMillis(1100));
         assertThat(result).isEqualTo("Hello CompletableFuture!");
+    }
+
+    @Test
+    @DisplayName("getNow 는 block 없이 즉각 리턴하며 아직 종료가 안된 상태일 경우 defualt 값을 반환한다.")
+    void getNow() {
+        CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "Hello CompletableFuture!";
+        });
+
+        String resultNow = completableFuture.getNow("Hello Now!");
+
+        assertThat(resultNow).isEqualTo("Hello Now!");
+    }
+
+    @Test
+    void exceptionally() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> completableFuture = CompletableFuture.<String>failedFuture(new IllegalStateException("뭔 상태여?"))
+            .exceptionally(throwable -> "ErrorMessage : " + throwable.getMessage());
+
+        assertThat(completableFuture.get())
+            .as("예외 발생시 exceptionally 에서 예외를 받아서 정상 흐름으로 처리해준다.")
+            .isEqualTo("ErrorMessage : 뭔 상태여?");
     }
 }
