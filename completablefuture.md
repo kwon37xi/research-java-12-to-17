@@ -7,52 +7,57 @@
 * https://kwonnam.pe.kr/wiki/java/8/completable_future
 * [Java 11 CompletableFuture](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/CompletableFuture.html)
 
-## Baeldung Guide To CompletableFuture
+## 참고 자료
+* [Java 8: Definitive guide to CompletableFuture](https://www.nurkiewicz.com/2013/05/java-8-definitive-guide-to.html)
+* [Java 8: CompletableFuture in action](https://www.nurkiewicz.com/2013/05/java-8-completablefuture-in-action.html)
+* [CompletableFuture can't be interrupted](https://www.nurkiewicz.com/2015/03/completablefuture-cant-be-interrupted.html)
+* [Asynchronous timeouts with CompletableFuture](https://www.nurkiewicz.com/2014/12/asynchronous-timeouts-with.html)
+* [Promises and CompletableFuture](https://www.nurkiewicz.com/2013/12/promises-and-completablefuture.html)
+* [Which thread executes CompletableFuture's tasks and callbacks?](https://www.nurkiewicz.com/2015/11/which-thread-executes.html)
 * [Guide To CompletableFuture](https://www.baeldung.com/java-completablefuture)
 * [Java 9 CompletableFuture API Improvements](https://www.baeldung.com/java-9-completablefuture)
-
 * JustAsFuture.java, JustAsFutureTest.java, CompletableFutureAsyncTest.java
 
-### thenApply
+## thenApply
 * `thenApply`는 `Stream.map`과 유사하게 `CompletableFuture`의 결과를 받아서 일반적인 다른 결과 값을 도출한다.
 * `thenApply`의 인자는 앞선 CF 의 결과값이다.
 * blocking 이 발생하지 않는다.
 
-### thenCompose
+## thenCompose
 * `thenCompose` 는 `Stream.flatMap` 과 유사하게, `CompletableFuture`의 결과를 받아서 다시 `CompletableFuture`를 생성한다.
 * 일반적으로 비동기 작업의 연쇄가 계속 이뤄질경우에는 `thenCompose`를 주로 사용하게 된다.
 * blocking 이 발생하지 않는다.
 
-### thenCombine
+## thenCombine
 * 두 개의 `CompletableFuture`를 독립 실행하고, 둘 다 실행이 끝나면 그 결과를 하나로 합치고자 할 때 사용한다.
 
-### thenAcceptBoth, runAfterBoth
+## thenAcceptBoth, runAfterBoth
 * `thenCombine`과 유사하지만, 결과 반환할게 없을 때 사용.
 * 그 뒤로 할게 없는데도 `get()`을 사용하지 않고 `thenXXX`를 사용하는 것은 이들은 non-blocking 이기 때문이다.
 `get()`은 쓰레드를 blocking 해버린다.
 
-### acceptEither, runAfterEither
+## acceptEither, runAfterEither
 * 둘 중에 첫번째로 실행된 것의 결과만을 취해서 처리한다. 반환할 게 없을 때 사용한다.
 
-### applyToEither
+## applyToEither
 * `acceptEight`, `runAfterEighter` 와 같이 첫번째로 실행된 것의 결과를 받아 다른 값으로 전환한다.
 * 헌데, 사실 다른 값으로 바꿀 필요 없이, 첫번째 결과를 바로 리턴하는 역할만 해도 충분하다.
 이 때는 `Function.identity()`로, 변경없이 반환하게 하고, 그 뒤여 변경(`map`) 처리가 필요하면 `thenApply`를 호출하면 된다.
 
-### allOf
+## allOf
 * 여러 `CompletableFuture`를 동시에 실행하고 그 결과를 모두 합친 `CompletableFuture` 를 생성한다.
 * 단, `CompletableFuture<Void>` 를 리턴하기 때문에 실제 실행된 결과 값을 반환 받을 수 없다.
 
-### anyOf
+## anyOf
 * 여러 `CompletableFuture`를 동시에 실행하고 그 중에 가장 먼저 실행이 완료된 것을 반환한다.
 * 단, `CompletableFuture<Object>` 타입이기 때문에, 어느 타입의 결과인지 명확히 알기 힘들다.
 
-### join
+## join
 * join 은 blocking 으로 결과가 나올 때 까지 기다려서, 그 결과를 리턴한다.
 * 여러 CF를 동시 실행하고 모두 실행될 때까지 기다려서 그 결과를 합치고자 할때는 `Stream`, `join`을 사용한다.
 * join 은 Unchecked Exception 만 던진다.
 
-### get
+## get
 * 결과가 나올 때 까지 기다려서, 그 결과를 리턴한다.
 * Checked Exception 을 던진다.
 
