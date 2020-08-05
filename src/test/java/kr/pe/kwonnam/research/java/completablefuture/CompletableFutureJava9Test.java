@@ -276,4 +276,33 @@ public class CompletableFutureJava9Test {
         Duration delayed = Duration.ofMillis(timestamps.get(1) - timestamps.get(0));
         assertThat(delayed).isBetween(Duration.ofMillis(1000), Duration.ofMillis(1100));
     }
+
+    @Test
+    @DisplayName("completedStage와 completedFuture 는 이미 완료된 상태의 객체를 반환한다.")
+    void completedStageAndCompletedFuture() {
+
+        assertThat(CompletableFuture.completedStage("Hello CompletionStage!"))
+            .isInstanceOf(CompletableFuture.class)
+            .isInstanceOf(CompletionStage.class)
+            .isCompletedWithValue("Hello CompletionStage!");
+
+        assertThat(CompletableFuture.completedFuture("Hello CompletableFuture!"))
+            .isInstanceOf(CompletableFuture.class)
+            .isCompletedWithValue("Hello CompletableFuture!");
+    }
+
+    @Test
+    void failedStageAndFailedFuture() {
+        assertThat(CompletableFuture.failedStage(new IllegalStateException("알 수 없는 상태입니다.")))
+            .isInstanceOf(CompletableFuture.class)
+            .isInstanceOf(CompletionStage.class)
+            .hasFailedWithThrowableThat()
+            .hasMessage("알 수 없는 상태입니다.");
+
+        assertThat(CompletableFuture.failedFuture(new IllegalArgumentException("인자가 올바르지 않습니다.")))
+            .isInstanceOf(CompletableFuture.class)
+            .hasFailedWithThrowableThat()
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("인자가 올바르지 않습니다.");
+    }
 }
