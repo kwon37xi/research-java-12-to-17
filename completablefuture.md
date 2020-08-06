@@ -21,7 +21,7 @@
 ## thenApply
 * `thenApply`는 `Stream/map`과 유사하게 `CompletableFuture`의 결과를 받아서 일반적인 다른 결과 값을 도출한다/
 * `thenApply`의 인자는 앞선 CF 의 결과값이다/
-* blocking 이 발생하지 않는다/
+* blocking 이 발생하지 않는다.
 
 ## thenCompose
 * `thenCompose` 는 `Stream/flatMap` 과 유사하게, `CompletableFuture`의 결과를 받아서 다시 `CompletableFuture`를 생성한다/
@@ -81,8 +81,9 @@ Unchecked Exception 이라서 `Stream/map` 에서 사용가능하다/
 
 ## supplyAsync과 후속 thenApply, thenAccept 의 쓰레드
 * [java - In which thread does CompletableFuture's completion handlers execute in? - Stack Overflow](https://stackoverflow/com/questions/46060438/in-which-thread-does-completablefutures-completion-handlers-execute-in)
+* [Which thread executes CompletableFuture's tasks and callbacks?](https://www.nurkiewicz.com/2015/11/which-thread-executes.html)
 * 작업의 `complete()` 시점 이전 혹은 이후에 `thenXXX` 호출 여부에 따라 `thenXXX` 의 실행 쓰레드가 달라질 수 있다/
-* 따라서 쓰레드를 확신하지 말고, 어디서 실행되어도 상관없게 작성해야 한다/
+* TODO
 
 ## CompletableFuture 의 상속
 * java 8의 `CompletableFuture` 는 사실상 상속하기 매우 어렵다/
