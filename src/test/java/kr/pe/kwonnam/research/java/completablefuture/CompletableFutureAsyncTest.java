@@ -26,10 +26,12 @@ import static org.assertj.core.api.Assertions.*;
 class CompletableFutureAsyncTest {
 
     private CompletableFutureAsync completableFutureAsync;
+    private String testThreadName;
 
     @BeforeEach
     void setUp() {
         completableFutureAsync = new CompletableFutureAsync();
+        testThreadName = Thread.currentThread().getName();
     }
 
     @Test
@@ -37,7 +39,7 @@ class CompletableFutureAsyncTest {
     void supplyAsyncBasic() throws ExecutionException, InterruptedException {
         CompletableFuture<String> cf = completableFutureAsync.supplyAsyncBasic();
 
-        assertThat(Thread.currentThread().getName()).isEqualTo("main");
+        assertThat(Thread.currentThread().getName()).isEqualTo(testThreadName);
         assertThat(cf.get()).startsWith("hello!")
             .contains("and ForkJoinPool.commonPool");
     }
@@ -67,7 +69,7 @@ class CompletableFutureAsyncTest {
 
         // thenAccept 의 쓰레드는 상황에 따라 달라진다.
 
-        assertThat(Thread.currentThread().getName()).isEqualTo("main");
+        assertThat(Thread.currentThread().getName()).isEqualTo(testThreadName);
     }
 
 
@@ -97,7 +99,7 @@ class CompletableFutureAsyncTest {
 
         // thenAccept 의 쓰레드는 상황에 따라 달라진다.
 
-        assertThat(Thread.currentThread().getName()).isEqualTo("main");
+        assertThat(Thread.currentThread().getName()).isEqualTo(testThreadName);
     }
 
     @Test

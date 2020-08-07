@@ -1,6 +1,9 @@
 package kr.pe.kwonnam.research.java.completablefuture;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -85,7 +88,8 @@ public class CompletableFutureJava9Test {
     @DisplayName("NeoCompletableFuture : runAsync 를 override 하여, 원하는 executor 로 실행한다.")
     void defaultExecutorRunAsync() {
         List<String> threadNames = Collections.synchronizedList(new ArrayList<>());
-        NeoCompletableFuture.runAsync​(() -> threadNames.add(Thread.currentThread().getName()), myExecutor);
+        NeoCompletableFuture.runAsync​(() -> threadNames.add(Thread.currentThread().getName()), myExecutor).join();
+
 
         assertThat(threadNames).hasSize(1)
             .hasSameElementsAs(List.of("MyExecutor-0"));
