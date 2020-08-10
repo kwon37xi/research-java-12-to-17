@@ -50,6 +50,7 @@
 * allOf 의 결과로 원하는 타입을 반환하기 기법
   * [Java 8: CompletableFuture in action](https://www/nurkiewicz/com/2013/05/java-8-completablefuture-in-action/html)
   * [CompletableFutureTypedAllOfTest.java](/src/test/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureTypedAllOfTest.java)
+  * [CompletableFutureCollector.java Stream Collector](src/main/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureCollector.java)
 
 ## anyOf
 * 여러 `CompletableFuture`를 동시에 실행하고 그 중에 가장 먼저 실행이 완료된 것을 반환한다.
