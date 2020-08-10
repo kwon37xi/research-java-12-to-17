@@ -47,10 +47,12 @@
 ## allOf
 * 여러 `CompletableFuture`를 동시에 실행하고 그 결과를 모두 합친 `CompletableFuture` 를 생성한다.
 * 단, `CompletableFuture<Void>` 를 리턴하기 때문에 실제 실행된 결과 값을 반환 받을 수 없다.
-* allOf 의 결과로 원하는 타입을 반환하기 기법
-  * [Java 8: CompletableFuture in action](https://www/nurkiewicz/com/2013/05/java-8-completablefuture-in-action/html)
-  * [CompletableFutureTypedAllOfTest.java](/src/test/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureTypedAllOfTest.java)
-  * [CompletableFutureCollector.java Stream Collector](src/main/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureCollector.java)
+
+## allOf / thenCombine으로 여러 CompletableFuture의 결과를 조합해서 원하는 타입으로 리턴하는 방법
+* [Java 8: CompletableFuture in action](https://www/nurkiewicz/com/2013/05/java-8-completablefuture-in-action/html)
+* [CompletableFutureTypedAllOfTest.java](/src/test/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureTypedAllOfTest.java)
+* [CompletableFutureCollector.java Stream Collector](src/main/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureCollector.java) : `allOf` 기반 collector
+* [CompletableFutureCombineCollector.java Stream Collector](src/main/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureCombineCollector.java) : `thenCombine` 기반 collector
 
 ## anyOf
 * 여러 `CompletableFuture`를 동시에 실행하고 그 중에 가장 먼저 실행이 완료된 것을 반환한다.
