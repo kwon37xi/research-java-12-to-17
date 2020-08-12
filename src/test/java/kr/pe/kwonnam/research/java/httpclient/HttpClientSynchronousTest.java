@@ -28,12 +28,12 @@ class HttpClientSynchronousTest {
         httpClient = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
             .followRedirects(HttpClient.Redirect.NORMAL)
-            .connectTimeout(Duration.ofMillis(1000))
+            .connectTimeout(Duration.ofSeconds(1))
             .build();
     }
 
     @Test
-    void syncGet() throws IOException, InterruptedException {
+    void get() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create("https://httpbin.org/get"))
