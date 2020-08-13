@@ -1,5 +1,5 @@
 # CompletableFuture research
-* package `kr/pe/kwonnam/research/java/completablefuture`
+* package  [test kr/pe/kwonnam/research/java/completablefuture](src/main/java/kr/pe/kwonnam/research/java/completablefuture)
 * [JustAsFutureTest](src/test/java/kr/pe/kwonnam/research/java/completablefuture/JustAsFutureTest)
 * [CompletableFutureAsyncTest/java](src/test/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureAsyncTest/java)
 * [CompletableFutureJava9Test/java](src/test/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureJava9Test/java)
@@ -92,8 +92,9 @@ Unchecked Exception 이라서 `Stream/map` 에서 사용가능하다.
 호출되면(그 안의 lambda가 실행된게 아니로 작업 등록만 된 것임 ) 이 작업은 앞선 `supplyAsync`와 동일한 쓰레드 풀에서 실행된다.
 * 첫번째 `supplyAsync`(혹은 어쨌든 비동기 `CompletableFuture`)가 끝난 뒤에 `thenApply`가 호출되면 이 작업은
 앞선 호출자 쓰레드(보통은 `main`)에서 실행된다.
-* 만약 `thenApply`에서 오래걸리는 blocking 작업을 하면 호출자 쓰레드가 블로킹 된다.
-* 따라서 완전 non blocking 코드를 짜야하는 경우거나, 어쨌든 비동기 작업을 원하는 경우에는 `thenApplyAsync` 같이 `*Async` 계통
+* 만약 `thenApply`에서 오래걸리는 blocking 작업을 하면 해당 작업을 수행하는 쓰레드가 블로킹 된다.
+* 따라서 완전 non blocking 코드를 짜야하는 경우거나, 어쨌든 비동기 작업을 원하는 경우에
+ **확실하게** 별도 쓰레드에서 실행되길 권한다면 `thenApplyAsync` 같이 `*Async` 계통
 메소드를 호출해야 한다.
 
 ## CompletableFuture 의 상속
@@ -114,10 +115,30 @@ Unchecked Exception 이라서 `Stream/map` 에서 사용가능하다.
 
 ## thenCompose, whenComplete, handle 의 차이점
 * 셋 다 새로운 `CompletableFuture`를 리턴한다.
-* `thenComplete' 는 앞선 실행이 오류가 없을 경우에만 후속으로 실행된다/ `Stream/flatMap`과 유사하다.
+* `thenComplete` 는 앞선 실행이 오류가 없을 경우에만 후속으로 실행된다. `Stream/flatMap`과 유사하다.
 * `whenComplete`, `handle` 은 앞선 실행이 성공으로 끝나든 예외가 발생하든 실행되면 성공값과 예외를 모두 인자로 받는다.
-* `whenComplete` 는 그 자체로 종결되는 것이 목표다.
+* `whenComplete` 는 그 자체로 종결되는 것이 목표다. `whenComplete`의 `supplier` 에서는 예외를 던지지 말아야한다.
 * `handle` 은 다시 새로운 `CompletableFuture` 작업이 시작된다.
+
+## whenComplete, handle 의 예외처리
+* [Java CompletableFuture - Understanding CompletionStage.whenComplete() method](https://www.logicbig.com/tutorials/core-java-tutorial/java-multi-threading/completion-stage-when-complete.html)
+* [Java CompletableFuture - Exception Handling](https://www.logicbig.com/tutorials/core-java-tutorial/java-multi-threading/completion-stages-exception-handling.html)
+* [Java's CompleteableFuture exception handling: whenComplete vs. handle](https://dempkow.ski/blog/java-completablefuture-exception-handling/)
+* [3 Ways to Handle Exception In Completable Future | Mincong's Blog](https://mincong.io/2020/05/30/exception-handling-in-completable-future/)
+
+* `exceptionally` 는 앞선 `CompletionStage`에서 예외가 발생했을 때만 호출되며, 예외가 발생되지 않았으면 무시된다. 예외를 처리해서 정상상태로 보정한다.
+
+* `whenComplete` 은 단순히 현재 상태의 실행 결과값과 예외 발생시 예외 값을 **볼 수만** 있다.
+그리고 그 상태 그대로 후속 `CompletionStage`로 전달된다.
+  * [CompletableFutureWhenCompleteTest.java](src/test/java/kr/pe/kwonnam/research/java/completablefuture/CompletableFutureWhenCompleteTest.java)
+  * 즉, 앞선 stage 에서 예외가 발생했다면 `whenComplete` 을 거쳐도 계속 예외 발생 상태로 남아있다.
+  * 따라서 `whenComplete`에서 절대로 예외가 발생하지 않게 주의해야한다.
+  * 만약 `whenComplete`에서 예외가 발생한다면,
+    * 앞선 작업에서 예외가 발생했다면 `whenComplete`의 예외는 **무시되고** 앞선 작업의 예외가 후속 `CompletionStage`로 전달된다.
+    * 앞선 작업이 정상 종료됐다면 `whenComplete`의 예외가 후속 `CompletionStage`로 전달된다.
+* `handle` 은 현재 상태의 실행 결과값과 예외 발생시의 예외 값을 받아서 원하는 대로 처리하고 후속 `CompletionStage` 로 변환해서 넘길 수 있다.
+  * 즉, 앞선 stage 에서 예외가 발생한 것을 `handle` 에서 정상 상태로 보정하는 것도 가능하고,
+  * 여기서 예외가 발생하면 그 예외가 후속 `CompletionStage`로 전달된다.
 
 ## orTimeout
 * 시간내에 complete 되지 않을 경우 `TimeoutException`이 발생하고, 시간내에 완료되면 그대로 결과를 반환한다.
