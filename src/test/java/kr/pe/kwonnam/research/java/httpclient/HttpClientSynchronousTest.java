@@ -61,7 +61,6 @@ class HttpClientSynchronousTest {
         assertThat(userAgent).isEqualTo("Java 11 HttpClient Bot");
     }
 
-
     @Test
     @DisplayName("POST 요청에 Form 파라미터 설정을 한다.")
     void postFormParameters() throws IOException, InterruptedException {
@@ -106,5 +105,36 @@ class HttpClientSynchronousTest {
             builder.append(URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8));
         }
         return HttpRequest.BodyPublishers.ofString(builder.toString());
+    }
+
+    @Test
+    @DisplayName("POST 요청 바디로 JSON 을 지정한다.")
+    void postJsonBody() throws IOException, InterruptedException {
+        String json = new StringBuilder()
+            .append("{")
+            .append("\"name\": \"권남\",")
+            .append("\"notes\": \"hello world!\"")
+            .append("}")
+            .toString();
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .POST(HttpRequest.BodyPublishers.ofString(json))
+            .uri(URI.create("https://httpbin.org/post"))
+            .setHeader("Usr-Agent", "Java 11 HttpClient POST json body bot")
+            .setHeader("Content-Type", "application/json")
+            .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        log.info("POST json response body : {}", response.body());
+        assertThat(response.statusCode()).isEqualTo(200);
+        DocumentContext ctx = JsonPath.parse(response.body());
+
+        String data = ctx.read("$.data", String.class);
+        log.info("POST json response data : {}", data);
+
+        DocumentContext dataCtx = JsonPath.parse(data);
+        assertThat(dataCtx.read("$.name", String.class)).isEqualTo("권남");
+        assertThat(dataCtx.read("$.notes", String.class)).isEqualTo("hello world!");
     }
 }

@@ -9,3 +9,5 @@
 * [WebSocket.java](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/WebSocket.html)
 
 ## Examples
+* [HttpClientSynchronousTest.java](src/test/java/kr/pe/kwonnam/research/java/httpclient/HttpClientSynchronousTest.java)
+* [HttpClientAsynchronousTest.java](src/test/java/kr/pe/kwonnam/research/java/httpclient/HttpClientAsynchronousTest.java)
