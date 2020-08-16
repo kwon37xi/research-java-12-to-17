@@ -8,6 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -136,5 +138,36 @@ class HttpClientSynchronousTest {
         DocumentContext dataCtx = JsonPath.parse(data);
         assertThat(dataCtx.read("$.name", String.class)).isEqualTo("권남");
         assertThat(dataCtx.read("$.notes", String.class)).isEqualTo("hello world!");
+    }
+
+    @Test
+    @DisplayName("BasicAuth 인증하기")
+    void authenticate() throws IOException, InterruptedException {
+        HttpClient authHttpClient = HttpClient.newBuilder()
+            .authenticator(new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication("kwonnam", "thisismyPassw0rd!".toCharArray());
+                }
+            })
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create("https://httpbin.org/basic-auth/kwonnam/thisismyPassw0rd!"))
+            .setHeader("User-Agent", "Java 11 HttpClient auth Bot")
+            .build();
+
+        HttpResponse<String> response = authHttpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        log.info("auth response body : {}", response.body());
+
+        assertThat(response.statusCode()).isEqualTo(200);
+
+        DocumentContext ctx = JsonPath.parse(response.body());
+
+        assertThat(ctx.read("$.authenticated", Boolean.class)).isTrue();
+        assertThat(ctx.read("$.user", String.class)).isEqualTo("kwonnam");
     }
 }
