@@ -3,10 +3,7 @@ package kr.pe.kwonnam.research.java.httpclient;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -16,7 +13,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -98,5 +97,40 @@ public class HttpClientAsynchronousTest {
             .build();
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    @Test
+    @DisplayName("stream 을 이용해 비동기 동시 호출 예제 - https://openjdk.java.net/groups/net/httpclient/recipes.html")
+    void concurrentRequests() throws ExecutionException, InterruptedException {
+        CompletableFuture<List<String>> resultCompletableFuture = getFromURIs(List.of(
+            URI.create("https://httpbin.org/get?greetings=hello"),
+            URI.create("https://httpbin.org/get?greetings=world"),
+            URI.create("https://httpbin.org/get?greetings=안녕"),
+            URI.create("https://httpbin.org/get?greetings=세상아")
+        ));
+
+        List<String> results = resultCompletableFuture.get();
+
+        log.info("concurrentRequests results : {}", results);
+        assertThat(results)
+            .isNotEmpty();
+    }
+
+    public CompletableFuture<List<String>> getFromURIs(List<URI> uris) {
+        List<HttpRequest> requests = uris.stream()
+            .map(HttpRequest::newBuilder)
+            .map(reqBuilder -> reqBuilder.build())
+            .collect(toList());
+
+        CompletableFuture<HttpResponse<String>>[] completableFutures = requests.stream()
+            .map(request -> httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()))
+            .toArray(CompletableFuture[]::new);
+
+        CompletableFuture<List<String>> resultCompletableFuture = CompletableFuture.allOf(completableFutures)
+            .thenApply(unused -> Stream.of(completableFutures)
+                .map(CompletableFuture::join)
+                .map(HttpResponse::body)
+                .collect(toList()));
+        return resultCompletableFuture;
     }
 }
