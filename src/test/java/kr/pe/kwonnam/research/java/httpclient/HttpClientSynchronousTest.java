@@ -17,6 +17,9 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +37,7 @@ class HttpClientSynchronousTest {
         httpClient = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
             .followRedirects(HttpClient.Redirect.NORMAL)
-            .connectTimeout(Duration.ofSeconds(1))
+            .connectTimeout(Duration.ofSeconds(3))
             .build();
     }
 
@@ -169,5 +172,28 @@ class HttpClientSynchronousTest {
 
         assertThat(ctx.read("$.authenticated", Boolean.class)).isTrue();
         assertThat(ctx.read("$.user", String.class)).isEqualTo("kwonnam");
+    }
+
+    @Test
+    @DisplayName("응답내용을 파일로 저장한다.")
+    void responseBodyAsFile() throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("http://httpbin.org/get?name=HttpClient&greetings=helloworld!"))
+            .build();
+
+        HttpResponse<Path> response =
+            httpClient.send(request, HttpResponse.BodyHandlers.ofFile(Files.createTempFile("httpresponse", ".json")));
+
+        log.info("response in file : {}", response.body());
+
+        Path responsePath = response.body();
+        String jsonStr = Files.readString(responsePath, StandardCharsets.UTF_8);
+
+        DocumentContext ctx = JsonPath.parse(jsonStr);
+
+        assertThat(ctx.read("$.args.greetings", String.class)).isEqualTo("helloworld!");
+        assertThat(ctx.read("$.args.name", String.class)).isEqualTo("HttpClient");
+
+        Files.deleteIfExists(responsePath);
     }
 }
