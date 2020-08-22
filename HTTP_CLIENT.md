@@ -20,6 +20,7 @@
 이미 HTTP 호출작업이 끝난 상태에서 등록된 후속 작업은 호출자 쓰레드에서 실행된다. 이것은 `CompletableFuture`의 특징이다.
 * 이 API로 생성된 `CompletableFuture`의 `obtrudeValue`와 `obtrudeException` 메소드는 항상 `UnsupportedOperationException` 내게 되어있다.
 * `cancel` 메소드를 호출해도, HTTP 호출을 중단하지는 않지만, 덜 끝난 상태의 `CompletableFuture`라면 예외 상태로 끝난다.
+* TODO ibm developer works 코드 정리
 
 ## Examples
 * [HttpClientSynchronousTest.java](src/test/java/kr/pe/kwonnam/research/java/httpclient/HttpClientSynchronousTest.java)
