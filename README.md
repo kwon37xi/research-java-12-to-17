@@ -5,4 +5,4 @@
 * [Java Multithreading](https://www.logicbig.com/tutorials/core-java-tutorial/java-multi-threading.html)
 * [CompletableFuture](COMPLETABLE_FUTURE.md)
 * [HttpClient](HTTP_CLIENT.md)
-* [ForkJoinPool](FORK_JOIN_POOL.md)
+* [ForkJoinPool](FORK_JOIN.md)
