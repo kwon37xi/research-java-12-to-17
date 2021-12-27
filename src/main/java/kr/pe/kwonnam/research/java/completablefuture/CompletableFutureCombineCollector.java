@@ -1,13 +1,16 @@
 package kr.pe.kwonnam.research.java.completablefuture;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 /**
  * 동일한 타입을 리턴하는 CompletableFuture&lt;T&gt; 리스트를 합쳐서 그 결과를 {@link List}로 리턴하는
