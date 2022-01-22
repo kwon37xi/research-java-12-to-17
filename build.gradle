@@ -9,6 +9,7 @@
 plugins {
     id 'java-library'
     id 'application'
+    id 'eclipse'
 }
 
 ext {
@@ -19,8 +20,8 @@ ext {
 group = 'kr.pe.kwonnam.research-java-12-to-17'
 version = '0.0.1-SNAPSHOT'
 
-sourceCompatibility = '17'
-targetCompatibility = '17'
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
@@ -34,6 +35,13 @@ tasks.withType(JavaCompile) {
 }
 tasks.withType(Test) {
     jvmArgs += "--enable-preview"
+}
+
+// buildship 은 아래를 실생하지 않는다.
+// 따라서 gradlew eclipse 를 실행해줘야 한다.
+eclipse.jdt.file.withProperties { props ->
+    props['org.eclipse.jdt.core.compiler.problem.enablePreviewFeatures']= 'enabled'
+    props['org.eclipse.jdt.core.compiler.problem.reportPreviewFeatures']= 'ignore'
 }
 
 dependencies {
