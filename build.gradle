@@ -29,6 +29,13 @@ repositories {
     jcenter()
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs += '--enable-preview'
+}
+tasks.withType(Test) {
+    jvmArgs += "--enable-preview"
+}
+
 dependencies {
     implementation 'org.slf4j:jcl-over-slf4j:1.7.30'
     implementation 'org.slf4j:log4j-over-slf4j:1.7.30'
@@ -66,5 +73,7 @@ test {
 
 application {
     // Define the main class for the application.
-    mainClassName = 'kr.pe.kwonnam.research.java.App'
+    mainClassName = project.properties.get("main", 'kr.pe.kwonnam.research.java.App')
+    applicationDefaultJvmArgs += "--enable-preview"
 }
+
