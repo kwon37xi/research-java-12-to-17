@@ -16,6 +16,8 @@ public class PatternMatchingInstanceOf {
             System.out.println("This capital of Netherlands is " + countryData.capital());
         }
 
+        // && 대신 || 일 경우에는 컴파일 오류 발생한다.
+        // || 라는 것은 객체 o 가 CountryData 가 아닌 상황에서 ContryData 로 변환해서 벼교하려는 시도이기 때문이다.
         if (o instanceof CountryData countryData && countryData.continent().equals("Europe")) {
             System.out.println("This continent of Netherlands is " + countryData.continent());
         }
